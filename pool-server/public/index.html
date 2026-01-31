@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitok Pool - lastbitcoin.org - CPU Mining</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="icon" type="image/png" href="/bc.png">
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <img src="/bc.png" alt="Bitok" class="logo-icon">
+                <h1>Bitok <span>Pool</span></h1>
+            </div>
+            <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle menu">&#9776;</button>
+            <nav id="main-nav">
+                <ul>
+                    <li><a href="#" data-page="home" class="active">Home</a></li>
+                    <li><a href="#" data-page="blocks">Blocks</a></li>
+                    <li><a href="#" data-page="payments">Payments</a></li>
+                    <li><a href="#" data-page="miners">Miners</a></li>
+                    <li><a href="#" data-page="help">Help</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div id="page-home" class="page">
+                <div class="stats-grid" id="stats-grid">
+                    <div class="stat-card">
+                        <div class="label">Pool Hashrate</div>
+                        <div class="value hashrate" id="stat-hashrate">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Active Miners</div>
+                        <div class="value miners" id="stat-miners">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Blocks Found</div>
+                        <div class="value blocks" id="stat-blocks">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Network Difficulty</div>
+                        <div class="value" id="stat-difficulty">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Block Height</div>
+                        <div class="value" id="stat-height">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Pool Fee</div>
+                        <div class="value" id="stat-fee">--</div>
+                    </div>
+                </div>
+
+                <div class="connect-box">
+                    <h3>How to Connect</h3>
+                    <div class="connect-info">
+                        <div class="connect-item">
+                            <div class="label">Stratum URL</div>
+                            <code id="stratum-url">stratum+tcp://localhost:3032</code>
+                        </div>
+                        <div class="connect-item">
+                            <div class="label">Mining Command (cpuminer)</div>
+                            <code>./cpuminer -a yespower --param-n=2048 --param-r=32 --param-key="BitokPoW" -o stratum+tcp://<span id="stratum-host">localhost</span>:<span id="stratum-port">3032</span> -u YOUR_BITOK_ADDRESS.worker1</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="miner-search">
+                    <input type="text" id="miner-address-input" placeholder="Enter your Bitok address to check stats...">
+                    <button onclick="lookupMiner()">Lookup</button>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Recent Blocks</h3>
+                        <a href="#" data-page="blocks">View All</a>
+                    </div>
+                    <div class="panel-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Height</th>
+                                    <th>Hash</th>
+                                    <th>Reward</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-blocks">
+                                <tr><td colspan="5" class="loading">Loading blocks</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Pool Information</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="pool-info">
+                            <div>
+                                <div class="info-item">
+                                    <span class="label">Coin</span>
+                                    <span class="value">Bitok (BITOK)</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Algorithm</span>
+                                    <span class="value">BitokPoW (Yespower)</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Block Reward</span>
+                                    <span class="value" id="info-reward">50 BITOK</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="info-item">
+                                    <span class="label">Payment Threshold</span>
+                                    <span class="value" id="info-threshold">1 BITOK</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Pool Fee</span>
+                                    <span class="value" id="info-fee">1%</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Explorer</span>
+                                    <a href="https://bitokd.run" target="_blank" class="value">bitokd.run</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-blocks" class="page hidden">
+                <div class="page-title">
+                    <h2>Blocks Found</h2>
+                    <p>All blocks discovered by pool miners</p>
+                </div>
+                <div class="panel">
+                    <div class="panel-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Height</th>
+                                    <th>Hash</th>
+                                    <th>Miner</th>
+                                    <th>Reward</th>
+                                    <th>Difficulty</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="blocks-table">
+                                <tr><td colspan="7" class="loading">Loading blocks</td></tr>
+                            </tbody>
+                        </table>
+                        <div class="pagination" id="blocks-pagination"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-payments" class="page hidden">
+                <div class="page-title">
+                    <h2>Recent Payments</h2>
+                    <p>Payouts to pool miners are processed automatically on an hourly basis after 121 block confirmations</p>
+                </div>
+                <div class="payment-timer-box">
+                    <div class="timer-label">Next Payout In</div>
+                    <div class="timer-value" id="payment-countdown">--:--:--</div>
+                    <div class="timer-note">Payments process every hour for confirmed blocks</div>
+                </div>
+                <div class="panel">
+                    <div class="panel-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Address</th>
+                                    <th>Amount</th>
+                                    <th>TX Hash</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payments-table">
+                                <tr><td colspan="5" class="loading">Loading payments</td></tr>
+                            </tbody>
+                        </table>
+                        <div class="pagination" id="payments-pagination"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-miners" class="page hidden">
+                <div class="page-title">
+                    <h2>Active Miners</h2>
+                    <p>Currently mining on the pool</p>
+                </div>
+                <div class="miner-search">
+                    <input type="text" id="miner-search-input" placeholder="Enter your Bitok address to check stats...">
+                    <button onclick="lookupMinerFromPage()">Lookup</button>
+                </div>
+                <div class="panel">
+                    <div class="panel-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Address</th>
+                                    <th>Hashrate</th>
+                                    <th>Shares</th>
+                                    <th>Last Share</th>
+                                </tr>
+                            </thead>
+                            <tbody id="miners-table">
+                                <tr><td colspan="4" class="loading">Loading miners</td></tr>
+                            </tbody>
+                        </table>
+                        <div class="pagination" id="miners-pagination"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-miner" class="page hidden">
+                <div class="page-title">
+                    <h2>Miner Statistics</h2>
+                    <p id="miner-address-display">--</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="label">Your Hashrate</div>
+                        <div class="value hashrate" id="miner-hashrate">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Workers</div>
+                        <div class="value miners" id="miner-workers">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Shares</div>
+                        <div class="value" id="miner-shares">--</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Immature</div>
+                        <div class="value" id="miner-immature">--</div>
+                        <div class="stat-note">Unconfirmed blocks</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Balance</div>
+                        <div class="value blocks" id="miner-balance">--</div>
+                        <div class="stat-note">Pending payout</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Total Paid</div>
+                        <div class="value" id="miner-paid">--</div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Workers</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="worker-list" id="worker-list">
+                            <div class="loading">Loading workers</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Payment History</h3>
+                    </div>
+                    <div class="panel-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Amount</th>
+                                    <th>TX Hash</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="miner-payments">
+                                <tr><td colspan="4" class="loading">Loading payments</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-help" class="page hidden">
+                <div class="page-title">
+                    <h2>Getting Started</h2>
+                    <p>How to mine Bitok on this pool</p>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>1. Get a Bitok Wallet</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p>Download the Bitok wallet from the official website or compile from source. Generate a new address to receive your mining rewards.</p>
+                        <br>
+                        <a href="https://bitokd.run" target="_blank">Visit Bitok Explorer</a>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>2. Download Mining Software</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p>Bitok uses the <strong>Yespower</strong> algorithm optimized for CPU mining. Recommended miners:</p>
+                        <br>
+                        <ul style="margin-left: 20px; line-height: 2;">
+                            <li><a href="https://github.com/JayDDee/cpuminer-opt" target="_blank">cpuminer-opt</a> (recommended)</li>
+                            <li><a href="https://github.com/tpruvot/cpuminer-multi" target="_blank">cpuminer-multi</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>3. Configure and Start Mining</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p>Run the miner with the following command:</p>
+                        <br>
+                        <div class="connect-item" style="max-width: 100%;">
+                            <code>./cpuminer -a yespower --param-n=2048 --param-r=32 --param-key="BitokPoW" -o stratum+tcp://<span id="help-host">localhost</span>:<span id="help-port">3032</span> -u YOUR_BITOK_ADDRESS.worker1</code>
+                        </div>
+                        <br>
+                        <p><strong>Parameters:</strong></p>
+                        <ul style="margin-left: 20px; line-height: 2; margin-top: 10px;">
+                            <li><code>-a yespower</code> - The mining algorithm</li>
+                            <li><code>--param-n=2048</code> - Yespower N parameter</li>
+                            <li><code>--param-r=32</code> - Yespower R parameter</li>
+                            <li><code>--param-key="BitokPoW"</code> - BitokPoW personalization key</li>
+                            <li><code>-o stratum+tcp://...</code> - Pool stratum address</li>
+                            <li><code>-u ADDRESS.worker</code> - Your Bitok address followed by worker name</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>4. Monitor Your Stats</h3>
+                    </div>
+                    <div class="panel-body">
+                        <p>Enter your Bitok address in the search box on the homepage or miners page to view your hashrate, workers, and payment history.</p>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>Pool Details</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="pool-info">
+                            <div>
+                                <div class="info-item">
+                                    <span class="label">Pool Fee</span>
+                                    <span class="value" id="help-fee">1%</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Payment Threshold</span>
+                                    <span class="value" id="help-threshold">1 BITOK</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Payment Interval</span>
+                                    <span class="value">Every hour</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="info-item">
+                                    <span class="label">Stratum Port</span>
+                                    <span class="value" id="help-stratum-port">3032</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Min Difficulty</span>
+                                    <span class="value">0.5</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="label">Vardiff</span>
+                                    <span class="value">Enabled</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-links">
+                <a href="https://bitokd.run" target="_blank">Block Explorer</a>
+                <a href="https://github.com/elvisjedusor/bitok" target="_blank">GitHub</a>
+                <a href="https://bitcointalk.org/index.php?topic=5572258.0" target="_blank">Support</a>
+            </div>
+            <div class="copyright">
+                lastbitcoin.org - Bitok Mining Pool
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
