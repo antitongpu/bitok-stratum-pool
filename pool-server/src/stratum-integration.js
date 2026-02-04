@@ -146,16 +146,10 @@ async function startStatsCollection() {
 
             await redis.recordHashrate(totalHashrate);
 
-            if (poolInstance && poolInstance.options && poolInstance.options.initStats) {
-                await redis.setPoolStats({
-                    difficulty: poolInstance.options.initStats.difficulty || 0
-                });
-            }
-
             if (poolInstance && poolInstance.jobManager && poolInstance.jobManager.currentJob) {
                 await redis.setPoolStats({
-                    height: (poolInstance.jobManager.currentJob.rpcData.height - 1) || 0
-
+                    height: (poolInstance.jobManager.currentJob.rpcData.height - 1) || 0,
+                    difficulty: poolInstance.jobManager.currentJob.difficulty || 0
                 });
             }
 
