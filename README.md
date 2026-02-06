@@ -2,9 +2,6 @@
 
 Mining pool server for Bitok (BITOK) with BitokPoW algorithm.
 
-![image](https://raw.githubusercontent.com/antitongpu/bitok-stratum-pool/refs/heads/main/pool.png)
-
-
 ## Requirements
 
 - Node.js 22+

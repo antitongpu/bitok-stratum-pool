@@ -95,6 +95,25 @@ export async function recordShare(minerAddress, workerName, difficulty) {
     await multi.exec();
 }
 
+function calculateHashrateFromShares(recentShares) {
+    if (recentShares.length === 0) return 0;
+
+    const now = Date.now();
+    let oldestShare = now;
+    let totalDiff = 0;
+
+    for (const share of recentShares) {
+        const parts = share.split(':');
+        const ts = parseInt(parts[0]);
+        const diff = parseFloat(parts[1]) || config.pool.minDiff;
+        if (ts < oldestShare) oldestShare = ts;
+        totalDiff += diff;
+    }
+
+    const timeWindow = Math.max((now - oldestShare) / 1000, 60);
+    return (totalDiff * Math.pow(2, 16)) / timeWindow;
+}
+
 export async function getMinerStats(address) {
     const minerKey = `${KEYS.MINER_PREFIX}${address}`;
     const sharesKey = `${KEYS.SHARES_PREFIX}${address}`;
@@ -108,19 +127,7 @@ export async function getMinerStats(address) {
         return null;
     }
 
-    let hashrate = 0;
-    if (recentShares.length > 0) {
-        const now = Date.now();
-        let oldestShare = now;
-        for (const share of recentShares) {
-            const [timestamp] = share.split(':');
-            const ts = parseInt(timestamp);
-            if (ts < oldestShare) oldestShare = ts;
-        }
-        const timeWindow = Math.max((now - oldestShare) / 1000, 60);
-        const normalizedDiff = recentShares.length * config.pool.minDiff;
-        hashrate = (normalizedDiff * Math.pow(2, 16)) / timeWindow;
-    }
+    const hashrate = calculateHashrateFromShares(recentShares);
 
     return {
         address: minerData.address,
@@ -146,19 +153,7 @@ export async function getMinerWorkers(address) {
                 recentShares = await redis.zrangebyscore(minerSharesKey, Date.now() - 3600000, '+inf');
             }
 
-            let hashrate = 0;
-            if (recentShares.length > 0) {
-                const now = Date.now();
-                let oldestShare = now;
-                for (const share of recentShares) {
-                    const [timestamp] = share.split(':');
-                    const ts = parseInt(timestamp);
-                    if (ts < oldestShare) oldestShare = ts;
-                }
-                const timeWindow = Math.max((now - oldestShare) / 1000, 60);
-                const normalizedDiff = recentShares.length * config.pool.minDiff;
-                hashrate = (normalizedDiff * Math.pow(2, 16)) / timeWindow;
-            }
+            const hashrate = calculateHashrateFromShares(recentShares);
 
             workers.push({
                 name: data.worker,

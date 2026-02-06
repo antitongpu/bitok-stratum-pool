@@ -267,6 +267,90 @@ Returns pool hashrate history.
 }
 ```
 
+---
+
+### GET /diagnostics
+
+Returns pool diagnostics and accounting summary.
+
+**Response:**
+```json
+{
+  "blocks": {
+    "total": 142,
+    "confirmed": 135,
+    "unconfirmed": 5,
+    "creditedToBalance": 130,
+    "pendingCredit": 5,
+    "orphaned": 2,
+    "totalRewardsSatoshi": 710000000000,
+    "totalRewardsBitok": 7100.0
+  },
+  "miners": {
+    "count": 25,
+    "totalPendingSatoshi": 1500000000,
+    "totalPendingBitok": 15.0,
+    "totalImmatureSatoshi": 2500000000,
+    "totalImmatureBitok": 25.0,
+    "totalPaidSatoshi": 650000000000,
+    "totalPaidBitok": 6500.0
+  },
+  "payments": {
+    "count": 85,
+    "totalPaidSatoshi": 650000000000,
+    "totalPaidBitok": 6500.0,
+    "failedCount": 0
+  },
+  "verification": {
+    "confirmedBlockRewardsBitok": 6750.0,
+    "expectedToMinersBitok": 6682.5,
+    "actualPaidPlusPendingBitok": 6515.0,
+    "immatureBlockRewardsBitok": 250.0,
+    "expectedImmatureBitok": 247.5,
+    "actualImmatureBitok": 25.0,
+    "discrepancyBitok": 167.5
+  },
+  "poolFeePercent": 1
+}
+```
+
+---
+
+### GET /reconciliation
+
+Returns detailed per-miner earnings reconciliation based on confirmed blocks.
+
+**Response:**
+```json
+{
+  "summary": {
+    "confirmedBlocks": 135,
+    "totalExpectedSatoshi": 668250000000,
+    "totalExpectedBitok": 6682.5,
+    "totalActualCreditedSatoshi": 651500000000,
+    "totalActualCreditedBitok": 6515.0,
+    "totalDiscrepancySatoshi": -16750000000,
+    "totalDiscrepancyBitok": -167.5,
+    "overPaymentBitok": 0
+  },
+  "miners": [
+    {
+      "address": "1ABC123...",
+      "expectedSatoshi": 150000000000,
+      "expectedBitok": 1500.0,
+      "actualCreditedSatoshi": 148500000000,
+      "actualCreditedBitok": 1485.0,
+      "balanceSatoshi": 50000000,
+      "balanceBitok": 0.5,
+      "paidSatoshi": 148450000000,
+      "paidBitok": 1484.5,
+      "discrepancySatoshi": -1500000000,
+      "discrepancyBitok": -15.0
+    }
+  ]
+}
+```
+
 **Note:** Miners are sorted by absolute discrepancy (largest first).
 
 ---

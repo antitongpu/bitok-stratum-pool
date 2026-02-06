@@ -74,11 +74,11 @@ See `.env.example` for all configuration options:
 
 The pool includes a fully automated payment system that:
 
-- Calculates payouts using proportional share distribution
+- Calculates payouts using PROP (Proportional) share distribution
 - Automatically pays miners when balance exceeds threshold
 - Uses Bitok RPC `sendtoaddress` for secure transactions
 - Tracks all payments with transaction IDs
-- Requires 12 block confirmations before payout
+- Requires 10 block confirmations before payout
 
 **Payment Configuration:**
 ```bash
@@ -86,6 +86,16 @@ POOL_FEE=1.0              # Pool fee percentage
 PAYMENT_THRESHOLD=1.0     # Minimum payout in BITOK
 PAYMENT_INTERVAL=3600     # Payment interval in seconds
 ```
+
+**How it works:**
+1. Miners submit shares which are recorded with difficulty
+2. When a block is found, it's marked as pending
+3. After 10 confirmations, block is marked as confirmed
+4. Payment processor calculates each miner's share
+5. Payments sent automatically via RPC every hour
+6. Transaction IDs stored for audit trail
+
+See [PAYMENTS.md](./PAYMENTS.md) for detailed documentation.
 
 ## API Endpoints
 
